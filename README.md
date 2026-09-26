@@ -24,7 +24,7 @@ Add these keybindings to `~/.config/hypr/bindings.lua`:
 -- Antigravity CLI & OmaGravity
 o.bind("SUPER + A", "Antigravity Quick Launch", "foot -a org.omarchy.agent -T 'Antigravity CLI' -D " .. (os.getenv("HOME") or "") .. "/Work agy --dangerously-skip-permissions")
 o.bind("SUPER + SHIFT + A", "Antigravity Continue Session", "foot -a org.omarchy.agent -T 'Antigravity CLI' -D " .. (os.getenv("HOME") or "") .. "/Work agy -c")
-o.bind("SUPER + SHIFT + CTRL + A", "OmaGravity Bar Toggle", "omarchy-shell shell toggle cjkaufman.omagravity")
+o.bind("SUPER + ALT + G", "OmaGravity Bar Toggle", "omarchy-shell shell toggle cjkaufman.omagravity")
 o.bind("SUPER + ALT + A", "Antigravity Desktop IDE", "antigravity")
 ```
 
@@ -65,11 +65,11 @@ Configurable via Omarchy's bar settings or `manifest.json`:
 
 | Setting | Type | Default | Description |
 |---|---|---|---|
+| `showOnBar` | boolean | `true` | Display status icon on top bar (when false, summon via hotkey) |
 | `launchMode` | enum | `terminal` | Target environment (`terminal`, `herdr`, `floating`, `scratchpad`) |
 | `preferredTerminal` | enum | `foot` | Terminal emulator (`foot`, `ghostty`, `default`) |
 | `defaultWorkDir` | enum | `work` | Default folder (`work`, `hivemind`, `home`) |
 | `skipPermissions` | boolean | `true` | Auto-approve tool execution permissions on quick launch |
-| `showBadge` | boolean | `true` | Show status badge when Antigravity is active or default |
 | `recentLimit` | integer | `5` | Maximum recent conversations shown in session list |
 | `refreshIntervalSec`| integer | `15` | Polling and SQLite state sync interval |
 
