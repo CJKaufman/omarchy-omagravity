@@ -53,11 +53,11 @@ Panel {
   readonly property string monoFont: bar ? bar.fontFamily : Style.font.family
 
   // Plugin Settings
+  readonly property bool showOnBar: Boolean(setting("showOnBar", true))
   readonly property string launchMode: String(setting("launchMode", "terminal"))
   readonly property string preferredTerminal: String(setting("preferredTerminal", "foot"))
   readonly property string defaultWorkDir: String(setting("defaultWorkDir", "work"))
   readonly property bool skipPermissions: Boolean(setting("skipPermissions", true))
-  readonly property bool showBadge: Boolean(setting("showBadge", true))
   readonly property int recentLimit: Math.max(3, Number(setting("recentLimit", 5)))
   readonly property int refreshIntervalSec: Math.max(5, Number(setting("refreshIntervalSec", 15)))
 
@@ -145,44 +145,42 @@ Panel {
     root.close()
   }
 
-  // Component sizing
-  implicitWidth: barButton.implicitWidth
-  implicitHeight: barButton.implicitHeight
+  // Component sizing: collapsible when showOnBar is false
+  implicitWidth: root.showOnBar ? barButton.implicitWidth : 0
+  implicitHeight: root.showOnBar ? barButton.implicitHeight : 0
   width: implicitWidth
   height: implicitHeight
+  visible: root.showOnBar || root.opened
 
   // Top Bar Button
   WidgetButton {
     id: barButton
     anchors.fill: parent
+    visible: root.showOnBar
     bar: root.bar
     active: root.opened
     activeColor: root.accent
     useActiveColor: true
     labelVisible: false
     hasVisualContent: true
-    fixedWidth: barContentRow.implicitWidth + Style.space(12)
+    fixedWidth: root.showOnBar ? (barContentRow.implicitWidth + Style.space(12)) : 0
 
     Row {
       id: barContentRow
       anchors.centerIn: parent
-      spacing: Style.space(6)
 
+      // Antigravity icon directly indicates status via color
       Text {
         anchors.verticalCenter: parent.verticalCenter
         text: root.glyphAgy
         font.family: root.monoFont
         font.pixelSize: Style.font.body
-        color: root.opened ? root.accent : (root.agyInstalled ? root.foreground : root.dim)
-      }
-
-      Rectangle {
-        visible: root.showBadge && root.isDefaultAgent
-        anchors.verticalCenter: parent.verticalCenter
-        implicitWidth: Style.space(6)
-        implicitHeight: Style.space(6)
-        radius: 3
-        color: root.successColor
+        color: {
+          if (root.opened) return root.accent
+          if (!root.agyInstalled) return root.urgent
+          if (root.isDefaultAgent) return root.successColor
+          return root.foreground
+        }
       }
     }
 
@@ -261,7 +259,7 @@ Panel {
                   text: root.glyphAgy
                   font.family: root.monoFont
                   font.pixelSize: Style.font.title
-                  color: root.accent
+                  color: root.isDefaultAgent ? root.successColor : root.accent
                 }
               }
 

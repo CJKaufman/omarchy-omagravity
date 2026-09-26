@@ -24,11 +24,18 @@
       "preferredTerminal": "foot",
       "defaultWorkDir": "work",
       "skipPermissions": true,
-      "showBadge": true,
+      "showOnBar": true,
       "recentLimit": 5,
       "refreshIntervalSec": 15
     },
     "schema": [
+      {
+        "key": "showOnBar",
+        "type": "boolean",
+        "label": "Show on Top Bar",
+        "defaultValue": true,
+        "description": "Display the OmaGravity status icon directly on the top bar."
+      },
       {
         "key": "launchMode",
         "type": "enum",
@@ -59,13 +66,6 @@
         "label": "Auto-Approve Tool Permissions",
         "defaultValue": true,
         "description": "Pass --dangerously-skip-permissions to agy on quick launch."
-      },
-      {
-        "key": "showBadge",
-        "type": "boolean",
-        "label": "Show Active / Default Badge on Bar",
-        "defaultValue": true,
-        "description": "Display a status indicator dot when Antigravity is active or default agent."
       },
       {
         "key": "recentLimit",
