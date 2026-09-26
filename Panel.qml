@@ -47,7 +47,10 @@ Panel {
   readonly property color subtleBg: Qt.rgba(foreground.r, foreground.g, foreground.b, 0.08)
   readonly property color cardBg: Qt.rgba(foreground.r, foreground.g, foreground.b, 0.04)
   readonly property color borderCol: Qt.rgba(foreground.r, foreground.g, foreground.b, 0.12)
-  readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
+  
+  // Clean font separation: proportional UI font for text, monospace for keybinds & code
+  readonly property string uiFont: Style.font.family
+  readonly property string monoFont: bar ? bar.fontFamily : Style.font.family
 
   // Plugin Settings
   readonly property string launchMode: String(setting("launchMode", "terminal"))
@@ -168,7 +171,7 @@ Panel {
       Text {
         anchors.verticalCenter: parent.verticalCenter
         text: root.glyphAgy
-        font.family: root.fontFamily
+        font.family: root.monoFont
         font.pixelSize: Style.font.body
         color: root.opened ? root.accent : (root.agyInstalled ? root.foreground : root.dim)
       }
@@ -256,7 +259,7 @@ Panel {
                 Text {
                   anchors.centerIn: parent
                   text: root.glyphAgy
-                  font.family: root.fontFamily
+                  font.family: root.monoFont
                   font.pixelSize: Style.font.heading
                   color: root.accent
                 }
@@ -271,8 +274,8 @@ Panel {
                   Text {
                     text: "Antigravity CLI"
                     textFormat: Text.PlainText
-                    font.family: root.fontFamily
-                    font.pixelSize: Style.font.body
+                    font.family: root.uiFont
+                    font.pixelSize: Style.font.subtitle
                     font.bold: true
                     color: root.foreground
                   }
@@ -287,7 +290,7 @@ Panel {
                   Text {
                     text: root.agyInstalled ? "Ready" : "Missing"
                     textFormat: Text.PlainText
-                    font.family: root.fontFamily
+                    font.family: root.uiFont
                     font.pixelSize: Style.font.caption
                     color: root.agyInstalled ? root.successColor : root.urgent
                   }
@@ -296,7 +299,7 @@ Panel {
                 Text {
                   text: root.agyVersion
                   textFormat: Text.PlainText
-                  font.family: root.fontFamily
+                  font.family: root.uiFont
                   font.pixelSize: Style.font.caption
                   color: root.dim
                 }
@@ -318,7 +321,7 @@ Panel {
                   anchors.centerIn: parent
                   text: root.isDefaultAgent ? "DEFAULT AGENT" : "SET AS DEFAULT"
                   textFormat: Text.PlainText
-                  font.family: root.fontFamily
+                  font.family: root.uiFont
                   font.pixelSize: Style.font.caption
                   font.bold: true
                   color: root.isDefaultAgent ? root.successColor : root.dim
@@ -328,7 +331,9 @@ Panel {
                   anchors.fill: parent
                   hoverEnabled: true
                   cursorShape: Qt.PointingHandCursor
-                  onClicked: root.runHelper(["set-default"])
+                  onClicked: {
+                    root.runHelper(["set-default"])
+                  }
                 }
               }
 
@@ -344,7 +349,7 @@ Panel {
                 Text {
                   anchors.centerIn: parent
                   text: root.glyphRefresh
-                  font.family: root.fontFamily
+                  font.family: root.monoFont
                   font.pixelSize: Style.font.caption
                   color: refreshMouseArea.containsMouse ? root.accent : root.foreground
                 }
@@ -364,8 +369,8 @@ Panel {
           Text {
             text: "Quick Launch"
             textFormat: Text.PlainText
-            font.family: root.fontFamily
-            font.pixelSize: Style.font.caption
+            font.family: root.uiFont
+            font.pixelSize: Style.font.bodySmall
             font.bold: true
             color: root.dim
           }
@@ -390,15 +395,15 @@ Panel {
                 spacing: Style.space(6)
                 Text {
                   text: root.glyphTerminal
-                  font.family: root.fontFamily
+                  font.family: root.monoFont
                   font.pixelSize: Style.font.body
                   color: btn1Area.containsMouse ? root.accent : root.foreground
                 }
                 Text {
                   text: "Interactive CLI"
                   textFormat: Text.PlainText
-                  font.family: root.fontFamily
-                  font.pixelSize: Style.font.caption
+                  font.family: root.uiFont
+                  font.pixelSize: Style.font.bodySmall
                   font.bold: true
                   color: root.foreground
                 }
@@ -427,15 +432,15 @@ Panel {
                 spacing: Style.space(6)
                 Text {
                   text: root.glyphHerdr
-                  font.family: root.fontFamily
+                  font.family: root.monoFont
                   font.pixelSize: Style.font.body
                   color: btn2Area.containsMouse ? root.accent : root.foreground
                 }
                 Text {
                   text: "Open in Herdr"
                   textFormat: Text.PlainText
-                  font.family: root.fontFamily
-                  font.pixelSize: Style.font.caption
+                  font.family: root.uiFont
+                  font.pixelSize: Style.font.bodySmall
                   font.bold: true
                   color: root.foreground
                 }
@@ -467,15 +472,15 @@ Panel {
                 spacing: Style.space(6)
                 Text {
                   text: root.glyphContinue
-                  font.family: root.fontFamily
+                  font.family: root.monoFont
                   font.pixelSize: Style.font.body
                   color: btn3Area.containsMouse ? root.accent : root.foreground
                 }
                 Text {
                   text: "Continue Last"
                   textFormat: Text.PlainText
-                  font.family: root.fontFamily
-                  font.pixelSize: Style.font.caption
+                  font.family: root.uiFont
+                  font.pixelSize: Style.font.bodySmall
                   font.bold: true
                   color: root.foreground
                 }
@@ -504,15 +509,15 @@ Panel {
                 spacing: Style.space(6)
                 Text {
                   text: root.glyphIde
-                  font.family: root.fontFamily
+                  font.family: root.monoFont
                   font.pixelSize: Style.font.body
                   color: btn4Area.containsMouse ? root.accent : root.foreground
                 }
                 Text {
                   text: "Antigravity IDE"
                   textFormat: Text.PlainText
-                  font.family: root.fontFamily
-                  font.pixelSize: Style.font.caption
+                  font.family: root.uiFont
+                  font.pixelSize: Style.font.bodySmall
                   font.bold: true
                   color: root.foreground
                 }
@@ -537,8 +542,8 @@ Panel {
             Text {
               text: "Recent Conversations"
               textFormat: Text.PlainText
-              font.family: root.fontFamily
-              font.pixelSize: Style.font.caption
+              font.family: root.uiFont
+              font.pixelSize: Style.font.bodySmall
               font.bold: true
               color: root.dim
             }
@@ -546,7 +551,7 @@ Panel {
             Text {
               text: root.recentSessions.length + " loaded"
               textFormat: Text.PlainText
-              font.family: root.fontFamily
+              font.family: root.uiFont
               font.pixelSize: Style.font.caption
               color: root.dim
             }
@@ -564,7 +569,7 @@ Panel {
               delegate: Rectangle {
                 id: sessionCard
                 width: sessionListCol.width
-                implicitHeight: Style.space(52)
+                implicitHeight: Style.space(48)
                 radius: 6
                 color: sessionMouseArea.containsMouse ? root.subtleBg : root.cardBg
                 border.color: sessionMouseArea.containsMouse ? root.accent : root.borderCol
@@ -577,8 +582,8 @@ Panel {
                   spacing: Style.space(10)
 
                   Rectangle {
-                    implicitWidth: Style.space(28)
-                    implicitHeight: Style.space(28)
+                    implicitWidth: Style.space(26)
+                    implicitHeight: Style.space(26)
                     radius: 6
                     color: root.subtleBg
                     Layout.alignment: Qt.AlignVCenter
@@ -586,7 +591,7 @@ Panel {
                     Text {
                       anchors.centerIn: parent
                       text: root.glyphHistory
-                      font.family: root.fontFamily
+                      font.family: root.monoFont
                       font.pixelSize: Style.font.caption
                       color: root.dim
                     }
@@ -595,13 +600,13 @@ Panel {
                   ColumnLayout {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter
-                    spacing: Style.space(2)
+                    spacing: 1
 
                     Text {
                       text: modelData.title || "Untitled Session"
                       textFormat: Text.PlainText
-                      font.family: root.fontFamily
-                      font.pixelSize: Style.font.caption
+                      font.family: root.uiFont
+                      font.pixelSize: Style.font.body
                       font.bold: true
                       color: root.foreground
                       elide: Text.ElideRight
@@ -614,24 +619,24 @@ Panel {
                       Text {
                         text: modelData.last_modified || "Recent"
                         textFormat: Text.PlainText
-                        font.family: root.fontFamily
-                        font.pixelSize: Style.font.micro
+                        font.family: root.uiFont
+                        font.pixelSize: Style.font.caption
                         color: root.dim
                       }
 
                       Text {
                         text: "•"
                         textFormat: Text.PlainText
-                        font.family: root.fontFamily
-                        font.pixelSize: Style.font.micro
+                        font.family: root.uiFont
+                        font.pixelSize: Style.font.caption
                         color: root.dim
                       }
 
                       Text {
                         text: (modelData.step_count || 0) + " turns"
                         textFormat: Text.PlainText
-                        font.family: root.fontFamily
-                        font.pixelSize: Style.font.micro
+                        font.family: root.uiFont
+                        font.pixelSize: Style.font.caption
                         color: root.dim
                       }
                     }
@@ -639,8 +644,8 @@ Panel {
 
                   // Resume Button
                   Rectangle {
-                    implicitWidth: resumeTxt.implicitWidth + Style.space(18)
-                    implicitHeight: Style.space(26)
+                    implicitWidth: Style.space(56)
+                    implicitHeight: Style.space(24)
                     radius: 4
                     color: resumeArea.containsMouse ? root.accent : root.subtleBg
                     border.color: resumeArea.containsMouse ? root.accent : root.borderCol
@@ -648,12 +653,11 @@ Panel {
                     Layout.alignment: Qt.AlignVCenter
 
                     Text {
-                      id: resumeTxt
                       anchors.centerIn: parent
                       text: "Resume"
                       textFormat: Text.PlainText
-                      font.family: root.fontFamily
-                      font.pixelSize: Style.font.caption
+                      font.family: root.uiFont
+                      font.pixelSize: Style.font.bodySmall
                       font.bold: true
                       color: resumeArea.containsMouse ? Color.background : root.foreground
                     }
@@ -692,7 +696,7 @@ Panel {
                 anchors.centerIn: parent
                 text: "No conversation history found in database"
                 textFormat: Text.PlainText
-                font.family: root.fontFamily
+                font.family: root.uiFont
                 font.pixelSize: Style.font.caption
                 color: root.dim
               }
@@ -718,135 +722,157 @@ Panel {
                 spacing: Style.space(6)
                 Text {
                   text: root.glyphKey
-                  font.family: root.fontFamily
+                  font.family: root.monoFont
                   font.pixelSize: Style.font.caption
                   color: root.accent
                 }
                 Text {
                   text: "Configured Keybindings"
                   textFormat: Text.PlainText
-                  font.family: root.fontFamily
-                  font.pixelSize: Style.font.caption
+                  font.family: root.uiFont
+                  font.pixelSize: Style.font.bodySmall
                   font.bold: true
                   color: root.foreground
                 }
               }
 
-              GridLayout {
+              ColumnLayout {
                 Layout.fillWidth: true
-                columns: 2
-                rowSpacing: Style.space(6)
-                columnSpacing: Style.space(12)
+                spacing: Style.space(6)
 
-                // Super + A
+                // Row 1
                 RowLayout {
-                  spacing: Style.space(6)
-                  Rectangle {
-                    implicitWidth: k1Text.implicitWidth + Style.space(10)
-                    implicitHeight: Style.space(20)
-                    radius: 3
-                    color: root.subtleBg
-                    border.color: root.borderCol
-                    border.width: 1
+                  Layout.fillWidth: true
+                  spacing: Style.space(8)
+
+                  // Key 1: Super + A
+                  RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Style.space(6)
+                    Rectangle {
+                      implicitWidth: k1Text.implicitWidth + Style.space(10)
+                      implicitHeight: Style.space(20)
+                      radius: 3
+                      color: root.subtleBg
+                      border.color: root.borderCol
+                      border.width: 1
+                      Text {
+                        id: k1Text
+                        anchors.centerIn: parent
+                        text: "Super + A"
+                        font.family: root.monoFont
+                        font.pixelSize: Style.font.caption
+                        font.bold: true
+                        color: root.accent
+                      }
+                    }
                     Text {
-                      id: k1Text
-                      anchors.centerIn: parent
-                      text: "Super + A"
-                      font.family: root.fontFamily
-                      font.pixelSize: Style.font.micro
-                      font.bold: true
-                      color: root.accent
+                      text: "Quick Launch"
+                      font.family: root.uiFont
+                      font.pixelSize: Style.font.caption
+                      color: root.dim
+                      elide: Text.ElideRight
+                      Layout.fillWidth: true
                     }
                   }
-                  Text {
-                    text: "Quick CLI"
-                    font.family: root.fontFamily
-                    font.pixelSize: Style.font.caption
-                    color: root.dim
+
+                  // Key 2: Super + Shift + A
+                  RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Style.space(6)
+                    Rectangle {
+                      implicitWidth: k2Text.implicitWidth + Style.space(10)
+                      implicitHeight: Style.space(20)
+                      radius: 3
+                      color: root.subtleBg
+                      border.color: root.borderCol
+                      border.width: 1
+                      Text {
+                        id: k2Text
+                        anchors.centerIn: parent
+                        text: "Super + Shift + A"
+                        font.family: root.monoFont
+                        font.pixelSize: Style.font.caption
+                        font.bold: true
+                        color: root.accent
+                      }
+                    }
+                    Text {
+                      text: "Continue Last"
+                      font.family: root.uiFont
+                      font.pixelSize: Style.font.caption
+                      color: root.dim
+                      elide: Text.ElideRight
+                      Layout.fillWidth: true
+                    }
                   }
                 }
 
-                // Super + Shift + A
+                // Row 2
                 RowLayout {
-                  spacing: Style.space(6)
-                  Rectangle {
-                    implicitWidth: k2Text.implicitWidth + Style.space(10)
-                    implicitHeight: Style.space(20)
-                    radius: 3
-                    color: root.subtleBg
-                    border.color: root.borderCol
-                    border.width: 1
-                    Text {
-                      id: k2Text
-                      anchors.centerIn: parent
-                      text: "Super + Shift + A"
-                      font.family: root.fontFamily
-                      font.pixelSize: Style.font.micro
-                      font.bold: true
-                      color: root.accent
-                    }
-                  }
-                  Text {
-                    text: "Continue Session"
-                    font.family: root.fontFamily
-                    font.pixelSize: Style.font.caption
-                    color: root.dim
-                  }
-                }
+                  Layout.fillWidth: true
+                  spacing: Style.space(8)
 
-                // Super + Alt + G
-                RowLayout {
-                  spacing: Style.space(6)
-                  Rectangle {
-                    implicitWidth: k3Text.implicitWidth + Style.space(10)
-                    implicitHeight: Style.space(20)
-                    radius: 3
-                    color: root.subtleBg
-                    border.color: root.borderCol
-                    border.width: 1
+                  // Key 3: Super + Alt + G
+                  RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Style.space(6)
+                    Rectangle {
+                      implicitWidth: k3Text.implicitWidth + Style.space(10)
+                      implicitHeight: Style.space(20)
+                      radius: 3
+                      color: root.subtleBg
+                      border.color: root.borderCol
+                      border.width: 1
+                      Text {
+                        id: k3Text
+                        anchors.centerIn: parent
+                        text: "Super + Alt + G"
+                        font.family: root.monoFont
+                        font.pixelSize: Style.font.caption
+                        font.bold: true
+                        color: root.accent
+                      }
+                    }
                     Text {
-                      id: k3Text
-                      anchors.centerIn: parent
-                      text: "Super + Alt + G"
-                      font.family: root.fontFamily
-                      font.pixelSize: Style.font.micro
-                      font.bold: true
-                      color: root.accent
+                      text: "OmaGravity Panel"
+                      font.family: root.uiFont
+                      font.pixelSize: Style.font.caption
+                      color: root.dim
+                      elide: Text.ElideRight
+                      Layout.fillWidth: true
                     }
                   }
-                  Text {
-                    text: "Toggle Panel"
-                    font.family: root.fontFamily
-                    font.pixelSize: Style.font.caption
-                    color: root.dim
-                  }
-                }
 
-                // Super + Alt + A
-                RowLayout {
-                  spacing: Style.space(6)
-                  Rectangle {
-                    implicitWidth: k4Text.implicitWidth + Style.space(10)
-                    implicitHeight: Style.space(20)
-                    radius: 3
-                    color: root.subtleBg
-                    border.color: root.borderCol
-                    border.width: 1
-                    Text {
-                      id: k4Text
-                      anchors.centerIn: parent
-                      text: "Super + Alt + A"
-                      font.family: root.fontFamily
-                      font.pixelSize: Style.font.micro
-                      font.bold: true
-                      color: root.accent
+                  // Key 4: Super + Alt + A
+                  RowLayout {
+                    Layout.fillWidth: true
+                    spacing: Style.space(6)
+                    Rectangle {
+                      implicitWidth: k4Text.implicitWidth + Style.space(10)
+                      implicitHeight: Style.space(20)
+                      radius: 3
+                      color: root.subtleBg
+                      border.color: root.borderCol
+                      border.width: 1
+                      Text {
+                        id: k4Text
+                        anchors.centerIn: parent
+                        text: "Super + Alt + A"
+                        font.family: root.monoFont
+                        font.pixelSize: Style.font.caption
+                        font.bold: true
+                        color: root.accent
+                      }
                     }
-                  }
-                  Text {
-                    text: "Desktop IDE"
-                    font.family: root.fontFamily
-                    font.pixelSize: Style.font.caption
-                    color: root.dim
+                    Text {
+                      text: "Antigravity IDE"
+                      font.family: root.uiFont
+                      font.pixelSize: Style.font.caption
+                      color: root.dim
+                      elide: Text.ElideRight
+                      Layout.fillWidth: true
+                    }
                   }
                 }
               }
