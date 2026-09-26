@@ -794,7 +794,7 @@ Panel {
                   }
                 }
 
-                // Super + Shift + Ctrl + A
+                // Super + Alt + G
                 RowLayout {
                   spacing: Style.space(6)
                   Rectangle {
@@ -807,7 +807,7 @@ Panel {
                     Text {
                       id: k3Text
                       anchors.centerIn: parent
-                      text: "Super+Ctrl+Shift+A"
+                      text: "Super + Alt + G"
                       font.family: root.fontFamily
                       font.pixelSize: Style.font.micro
                       font.bold: true
