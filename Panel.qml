@@ -212,7 +212,7 @@ Panel {
     open: root.opened
     focusTarget: keyCatcher
     contentWidth: panel.fittedContentWidth(Style.space(480))
-    contentHeight: panel.fittedContentHeight(menuCol.implicitHeight + Style.space(24), Style.space(580))
+    contentHeight: panel.fittedContentHeight(menuCol.implicitHeight + Style.space(20), Style.space(640))
 
     PanelKeyCatcher {
       id: keyCatcher
@@ -230,12 +230,12 @@ Panel {
         Column {
           id: menuCol
           width: parent.width
-          spacing: Style.space(10)
+          spacing: Style.space(6)
 
           // 1. Hero Status Card
           Rectangle {
             width: parent.width
-            implicitHeight: heroLayout.implicitHeight + Style.space(16)
+            implicitHeight: heroLayout.implicitHeight + Style.space(12)
             radius: 8
             color: root.cardBg
             border.color: root.borderCol
@@ -244,14 +244,14 @@ Panel {
             RowLayout {
               id: heroLayout
               anchors.fill: parent
-              anchors.margins: Style.space(10)
-              spacing: Style.space(10)
+              anchors.margins: Style.space(8)
+              spacing: Style.space(8)
 
               // Antigravity Glyph Box
               Rectangle {
-                implicitWidth: Style.space(38)
-                implicitHeight: Style.space(38)
-                radius: 8
+                implicitWidth: Style.space(32)
+                implicitHeight: Style.space(32)
+                radius: 6
                 color: root.subtleBg
                 border.color: root.borderCol
                 border.width: 1
@@ -260,13 +260,13 @@ Panel {
                   anchors.centerIn: parent
                   text: root.glyphAgy
                   font.family: root.monoFont
-                  font.pixelSize: Style.font.heading
+                  font.pixelSize: Style.font.title
                   color: root.accent
                 }
               }
 
               ColumnLayout {
-                spacing: Style.space(2)
+                spacing: 1
 
                 RowLayout {
                   spacing: Style.space(6)
@@ -281,9 +281,9 @@ Panel {
                   }
 
                   Rectangle {
-                    implicitWidth: Style.space(8)
-                    implicitHeight: Style.space(8)
-                    radius: 4
+                    implicitWidth: Style.space(7)
+                    implicitHeight: Style.space(7)
+                    radius: 3.5
                     color: root.agyInstalled ? root.successColor : root.urgent
                   }
 
@@ -309,9 +309,9 @@ Panel {
 
               // Default Agent Pill
               Rectangle {
-                implicitWidth: defLabel.implicitWidth + Style.space(16)
-                implicitHeight: Style.space(26)
-                radius: 13
+                implicitWidth: defLabel.implicitWidth + Style.space(14)
+                implicitHeight: Style.space(22)
+                radius: 11
                 color: root.isDefaultAgent ? Qt.rgba(78/255, 186/255, 111/255, 0.15) : root.subtleBg
                 border.color: root.isDefaultAgent ? root.successColor : root.borderCol
                 border.width: 1
@@ -339,9 +339,9 @@ Panel {
 
               // Refresh Button
               Rectangle {
-                implicitWidth: Style.space(26)
-                implicitHeight: Style.space(26)
-                radius: 6
+                implicitWidth: Style.space(22)
+                implicitHeight: Style.space(22)
+                radius: 4
                 color: refreshMouseArea.containsMouse ? root.subtleBg : "transparent"
                 border.color: refreshMouseArea.containsMouse ? root.accent : root.borderCol
                 border.width: 1
@@ -370,7 +370,7 @@ Panel {
             text: "Quick Launch"
             textFormat: Text.PlainText
             font.family: root.uiFont
-            font.pixelSize: Style.font.bodySmall
+            font.pixelSize: Style.font.caption
             font.bold: true
             color: root.dim
           }
@@ -378,13 +378,13 @@ Panel {
           GridLayout {
             width: parent.width
             columns: 2
-            rowSpacing: Style.space(6)
+            rowSpacing: Style.space(4)
             columnSpacing: Style.space(6)
 
             // Button: Launch CLI
             Rectangle {
               Layout.fillWidth: true
-              implicitHeight: Style.space(34)
+              implicitHeight: Style.space(28)
               radius: 6
               color: btn1Area.containsMouse ? root.subtleBg : root.cardBg
               border.color: btn1Area.containsMouse ? root.accent : root.borderCol
@@ -396,14 +396,14 @@ Panel {
                 Text {
                   text: root.glyphTerminal
                   font.family: root.monoFont
-                  font.pixelSize: Style.font.body
+                  font.pixelSize: Style.font.bodySmall
                   color: btn1Area.containsMouse ? root.accent : root.foreground
                 }
                 Text {
                   text: "Interactive CLI"
                   textFormat: Text.PlainText
                   font.family: root.uiFont
-                  font.pixelSize: Style.font.bodySmall
+                  font.pixelSize: Style.font.caption
                   font.bold: true
                   color: root.foreground
                 }
@@ -421,7 +421,7 @@ Panel {
             // Button: Open in Herdr
             Rectangle {
               Layout.fillWidth: true
-              implicitHeight: Style.space(34)
+              implicitHeight: Style.space(28)
               radius: 6
               color: btn2Area.containsMouse ? root.subtleBg : root.cardBg
               border.color: btn2Area.containsMouse ? root.accent : root.borderCol
@@ -433,14 +433,14 @@ Panel {
                 Text {
                   text: root.glyphHerdr
                   font.family: root.monoFont
-                  font.pixelSize: Style.font.body
+                  font.pixelSize: Style.font.bodySmall
                   color: btn2Area.containsMouse ? root.accent : root.foreground
                 }
                 Text {
                   text: "Open in Herdr"
                   textFormat: Text.PlainText
                   font.family: root.uiFont
-                  font.pixelSize: Style.font.bodySmall
+                  font.pixelSize: Style.font.caption
                   font.bold: true
                   color: root.foreground
                 }
@@ -461,7 +461,7 @@ Panel {
             // Button: Continue Last Session
             Rectangle {
               Layout.fillWidth: true
-              implicitHeight: Style.space(34)
+              implicitHeight: Style.space(28)
               radius: 6
               color: btn3Area.containsMouse ? root.subtleBg : root.cardBg
               border.color: btn3Area.containsMouse ? root.accent : root.borderCol
@@ -473,14 +473,14 @@ Panel {
                 Text {
                   text: root.glyphContinue
                   font.family: root.monoFont
-                  font.pixelSize: Style.font.body
+                  font.pixelSize: Style.font.bodySmall
                   color: btn3Area.containsMouse ? root.accent : root.foreground
                 }
                 Text {
                   text: "Continue Last"
                   textFormat: Text.PlainText
                   font.family: root.uiFont
-                  font.pixelSize: Style.font.bodySmall
+                  font.pixelSize: Style.font.caption
                   font.bold: true
                   color: root.foreground
                 }
@@ -498,7 +498,7 @@ Panel {
             // Button: Launch Antigravity IDE
             Rectangle {
               Layout.fillWidth: true
-              implicitHeight: Style.space(34)
+              implicitHeight: Style.space(28)
               radius: 6
               color: btn4Area.containsMouse ? root.subtleBg : root.cardBg
               border.color: btn4Area.containsMouse ? root.accent : root.borderCol
@@ -510,14 +510,14 @@ Panel {
                 Text {
                   text: root.glyphIde
                   font.family: root.monoFont
-                  font.pixelSize: Style.font.body
+                  font.pixelSize: Style.font.bodySmall
                   color: btn4Area.containsMouse ? root.accent : root.foreground
                 }
                 Text {
                   text: "Antigravity IDE"
                   textFormat: Text.PlainText
                   font.family: root.uiFont
-                  font.pixelSize: Style.font.bodySmall
+                  font.pixelSize: Style.font.caption
                   font.bold: true
                   color: root.foreground
                 }
@@ -543,7 +543,7 @@ Panel {
               text: "Recent Conversations"
               textFormat: Text.PlainText
               font.family: root.uiFont
-              font.pixelSize: Style.font.bodySmall
+              font.pixelSize: Style.font.caption
               font.bold: true
               color: root.dim
             }
@@ -561,7 +561,7 @@ Panel {
           Column {
             id: sessionListCol
             width: parent.width
-            spacing: Style.space(6)
+            spacing: Style.space(4)
 
             Repeater {
               model: root.recentSessions
@@ -569,7 +569,7 @@ Panel {
               delegate: Rectangle {
                 id: sessionCard
                 width: sessionListCol.width
-                implicitHeight: Style.space(48)
+                implicitHeight: Style.space(38)
                 radius: 6
                 color: sessionMouseArea.containsMouse ? root.subtleBg : root.cardBg
                 border.color: sessionMouseArea.containsMouse ? root.accent : root.borderCol
@@ -577,14 +577,14 @@ Panel {
 
                 RowLayout {
                   anchors.fill: parent
-                  anchors.leftMargin: Style.space(10)
-                  anchors.rightMargin: Style.space(10)
-                  spacing: Style.space(10)
+                  anchors.leftMargin: Style.space(8)
+                  anchors.rightMargin: Style.space(8)
+                  spacing: Style.space(8)
 
                   Rectangle {
-                    implicitWidth: Style.space(26)
-                    implicitHeight: Style.space(26)
-                    radius: 6
+                    implicitWidth: Style.space(22)
+                    implicitHeight: Style.space(22)
+                    radius: 4
                     color: root.subtleBg
                     Layout.alignment: Qt.AlignVCenter
 
@@ -600,13 +600,13 @@ Panel {
                   ColumnLayout {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter
-                    spacing: 1
+                    spacing: 0
 
                     Text {
                       text: modelData.title || "Untitled Session"
                       textFormat: Text.PlainText
                       font.family: root.uiFont
-                      font.pixelSize: Style.font.body
+                      font.pixelSize: Style.font.caption
                       font.bold: true
                       color: root.foreground
                       elide: Text.ElideRight
@@ -614,7 +614,7 @@ Panel {
                     }
 
                     RowLayout {
-                      spacing: Style.space(6)
+                      spacing: Style.space(4)
 
                       Text {
                         text: modelData.last_modified || "Recent"
@@ -644,8 +644,8 @@ Panel {
 
                   // Resume Button
                   Rectangle {
-                    implicitWidth: Style.space(56)
-                    implicitHeight: Style.space(24)
+                    implicitWidth: Style.space(52)
+                    implicitHeight: Style.space(20)
                     radius: 4
                     color: resumeArea.containsMouse ? root.accent : root.subtleBg
                     border.color: resumeArea.containsMouse ? root.accent : root.borderCol
@@ -657,7 +657,7 @@ Panel {
                       text: "Resume"
                       textFormat: Text.PlainText
                       font.family: root.uiFont
-                      font.pixelSize: Style.font.bodySmall
+                      font.pixelSize: Style.font.caption
                       font.bold: true
                       color: resumeArea.containsMouse ? Color.background : root.foreground
                     }
@@ -686,7 +686,7 @@ Panel {
             Rectangle {
               visible: root.recentSessions.length === 0
               width: sessionListCol.width
-              implicitHeight: Style.space(48)
+              implicitHeight: Style.space(38)
               radius: 6
               color: root.cardBg
               border.color: root.borderCol
@@ -706,7 +706,7 @@ Panel {
           // 4. Keybindings Guide Card
           Rectangle {
             width: parent.width
-            implicitHeight: keyCol.implicitHeight + Style.space(16)
+            implicitHeight: keyCol.implicitHeight + Style.space(10)
             radius: 6
             color: root.cardBg
             border.color: root.borderCol
@@ -715,8 +715,8 @@ Panel {
             ColumnLayout {
               id: keyCol
               anchors.fill: parent
-              anchors.margins: Style.space(10)
-              spacing: Style.space(8)
+              anchors.margins: Style.space(6)
+              spacing: Style.space(4)
 
               RowLayout {
                 spacing: Style.space(6)
@@ -730,7 +730,7 @@ Panel {
                   text: "Configured Keybindings"
                   textFormat: Text.PlainText
                   font.family: root.uiFont
-                  font.pixelSize: Style.font.bodySmall
+                  font.pixelSize: Style.font.caption
                   font.bold: true
                   color: root.foreground
                 }
@@ -738,7 +738,7 @@ Panel {
 
               ColumnLayout {
                 Layout.fillWidth: true
-                spacing: Style.space(6)
+                spacing: Style.space(4)
 
                 // Row 1
                 RowLayout {
@@ -748,10 +748,10 @@ Panel {
                   // Key 1: Super + A
                   RowLayout {
                     Layout.fillWidth: true
-                    spacing: Style.space(6)
+                    spacing: Style.space(4)
                     Rectangle {
-                      implicitWidth: k1Text.implicitWidth + Style.space(10)
-                      implicitHeight: Style.space(20)
+                      implicitWidth: k1Text.implicitWidth + Style.space(8)
+                      implicitHeight: Style.space(18)
                       radius: 3
                       color: root.subtleBg
                       border.color: root.borderCol
@@ -779,10 +779,10 @@ Panel {
                   // Key 2: Super + Shift + A
                   RowLayout {
                     Layout.fillWidth: true
-                    spacing: Style.space(6)
+                    spacing: Style.space(4)
                     Rectangle {
-                      implicitWidth: k2Text.implicitWidth + Style.space(10)
-                      implicitHeight: Style.space(20)
+                      implicitWidth: k2Text.implicitWidth + Style.space(8)
+                      implicitHeight: Style.space(18)
                       radius: 3
                       color: root.subtleBg
                       border.color: root.borderCol
@@ -816,10 +816,10 @@ Panel {
                   // Key 3: Super + Alt + G
                   RowLayout {
                     Layout.fillWidth: true
-                    spacing: Style.space(6)
+                    spacing: Style.space(4)
                     Rectangle {
-                      implicitWidth: k3Text.implicitWidth + Style.space(10)
-                      implicitHeight: Style.space(20)
+                      implicitWidth: k3Text.implicitWidth + Style.space(8)
+                      implicitHeight: Style.space(18)
                       radius: 3
                       color: root.subtleBg
                       border.color: root.borderCol
@@ -847,10 +847,10 @@ Panel {
                   // Key 4: Super + Alt + A
                   RowLayout {
                     Layout.fillWidth: true
-                    spacing: Style.space(6)
+                    spacing: Style.space(4)
                     Rectangle {
-                      implicitWidth: k4Text.implicitWidth + Style.space(10)
-                      implicitHeight: Style.space(20)
+                      implicitWidth: k4Text.implicitWidth + Style.space(8)
+                      implicitHeight: Style.space(18)
                       radius: 3
                       color: root.subtleBg
                       border.color: root.borderCol
@@ -866,7 +866,7 @@ Panel {
                       }
                     }
                     Text {
-                      text: "Antigravity IDE"
+                      text: "Desktop IDE"
                       font.family: root.uiFont
                       font.pixelSize: Style.font.caption
                       color: root.dim
