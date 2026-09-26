@@ -1,0 +1,445 @@
+#!/usr/bin/env python3
+"""
+OmaGravity CLI Core
+Antigravity CLI integration engine for Omarchy.
+Author: Carl Kaufman
+"""
+
+import sys
+import os
+import stat
+import json
+import sqlite3
+import shutil
+import subprocess
+import argparse
+import tempfile
+from pathlib import Path
+from typing import Dict, Any, List, Optional
+from datetime import datetime
+
+# Security bounds: trusted binary directories
+TRUSTED_BIN_DIRS = [
+    Path(os.path.expanduser("~/.local/bin")),
+    Path("/usr/local/bin"),
+    Path("/usr/bin"),
+    Path("/bin")
+]
+
+MAX_OUTPUT_BYTES = 262144  # 256 KB ceiling
+SUBPROCESS_TIMEOUT_SEC = 5.0
+
+STATE_DIR = Path(os.path.expanduser("~/.local/state/omarchy/cjkaufman.omagravity"))
+STATE_FILE = STATE_DIR / "state.json"
+DB_PATH = Path(os.path.expanduser("~/.gemini/antigravity-cli/conversation_summaries.db"))
+DEFAULT_AGENT_FILE = Path(os.path.expanduser("~/.config/omarchy/defaults/agent"))
+
+
+def find_trusted_binary(name: str) -> Optional[str]:
+    """Finds an executable in trusted directories with ownership and permission checks."""
+    current_uid = os.getuid()
+    for directory in TRUSTED_BIN_DIRS:
+        candidate = directory / name
+        if candidate.is_file() and os.access(candidate, os.X_OK):
+            try:
+                st = candidate.stat()
+                if st.st_uid in (0, current_uid):
+                    return str(candidate)
+            except OSError:
+                continue
+
+    resolved = shutil.which(name)
+    if resolved:
+        try:
+            st = os.stat(resolved)
+            if st.st_uid in (0, current_uid) and os.access(resolved, os.X_OK):
+                return resolved
+        except OSError:
+            pass
+    return None
+
+
+def run_bounded_cmd(cmd: List[str], timeout: float = SUBPROCESS_TIMEOUT_SEC) -> subprocess.CompletedProcess:
+    """Runs a subprocess with non-blocking bounded output and timeouts."""
+    return subprocess.run(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        timeout=timeout,
+        errors="replace"
+    )
+
+
+def ensure_state_dir():
+    """Ensures state directory exists with secure 0o700 permissions owned by user."""
+    if not STATE_DIR.exists():
+        STATE_DIR.mkdir(parents=True, mode=0o700, exist_ok=True)
+    else:
+        try:
+            STATE_DIR.chmod(0o700)
+        except OSError:
+            pass
+
+
+def write_atomic_state(data: Dict[str, Any]):
+    """Writes state atomically with mode 0o600."""
+    ensure_state_dir()
+    payload = json.dumps(data, indent=2)
+    temp_file = tempfile.NamedTemporaryFile(
+        mode="w",
+        dir=STATE_DIR,
+        prefix="state_",
+        suffix=".tmp",
+        delete=False
+    )
+    try:
+        temp_file.write(payload)
+        temp_file.flush()
+        os.fsync(temp_file.fileno())
+        temp_file.close()
+        os.chmod(temp_file.name, 0o600)
+        os.replace(temp_file.name, STATE_FILE)
+    except Exception:
+        if os.path.exists(temp_file.name):
+            try:
+                os.unlink(temp_file.name)
+            except OSError:
+                pass
+        raise
+
+
+def resolve_workdir(preset: str) -> Path:
+    """Resolves working directory from preset name."""
+    home = Path.home()
+    if preset == "work":
+        work = home / "Work"
+        return work if work.is_dir() else home
+    elif preset == "hivemind":
+        hivemind = home / "Hivemind"
+        return hivemind if hivemind.is_dir() else (home / "Work" if (home / "Work").is_dir() else home)
+    return home
+
+
+def format_relative_time(iso_or_ts: str) -> str:
+    """Formats an ISO timestamp into a friendly relative time string."""
+    if not iso_or_ts:
+        return "Recent"
+    try:
+        # Try ISO format
+        clean_str = iso_or_ts.replace("Z", "+00:00")
+        dt = datetime.fromisoformat(clean_str)
+        now = datetime.now(dt.tzinfo) if dt.tzinfo else datetime.now()
+        diff = now - dt
+        seconds = int(diff.total_seconds())
+
+        if seconds < 60:
+            return "Just now"
+        elif seconds < 3600:
+            m = seconds // 60
+            return f"{m}m ago"
+        elif seconds < 86400:
+            h = seconds // 3600
+            return f"{h}h ago"
+        else:
+            d = seconds // 86400
+            return f"{d}d ago"
+    except Exception:
+        return str(iso_or_ts)[:16]
+
+
+def cmd_doctor() -> Dict[str, Any]:
+    """Runs comprehensive diagnostics on Antigravity and system components."""
+    agy_bin = find_trusted_binary("agy")
+    herdr_bin = find_trusted_binary("herdr")
+    foot_bin = find_trusted_binary("foot")
+    ghostty_bin = find_trusted_binary("ghostty")
+    hyprctl_bin = find_trusted_binary("hyprctl")
+    notify_bin = find_trusted_binary("notify-send")
+    ide_bin = find_trusted_binary("antigravity-ide") or find_trusted_binary("antigravity")
+
+    db_ok = DB_PATH.is_file() and os.access(DB_PATH, os.R_OK)
+
+    is_default = False
+    if DEFAULT_AGENT_FILE.is_file():
+        try:
+            content = DEFAULT_AGENT_FILE.read_text().strip()
+            is_default = content in ("agy", "antigravity")
+        except Exception:
+            pass
+
+    version_str = "Antigravity CLI"
+    if agy_bin:
+        try:
+            res = run_bounded_cmd([agy_bin, "--version"], timeout=2.0)
+            if res.returncode == 0 and res.stdout:
+                version_str = res.stdout.strip().splitlines()[0]
+            else:
+                version_str = "Antigravity Active"
+        except Exception:
+            version_str = "Antigravity Active"
+
+    report = {
+        "status": "healthy" if agy_bin else "degraded",
+        "agy": {
+            "installed": bool(agy_bin),
+            "path": agy_bin,
+            "version": version_str,
+            "isDefaultAgent": is_default
+        },
+        "database": {
+            "path": str(DB_PATH),
+            "readable": db_ok
+        },
+        "integrations": {
+            "herdr": bool(herdr_bin),
+            "foot": bool(foot_bin),
+            "ghostty": bool(ghostty_bin),
+            "hyprland": bool(hyprctl_bin),
+            "notify": bool(notify_bin),
+            "ide": bool(ide_bin)
+        },
+        "stateDir": {
+            "path": str(STATE_DIR),
+            "exists": STATE_DIR.exists()
+        }
+    }
+    return report
+
+
+def cmd_sync(recent_limit: int = 5) -> Dict[str, Any]:
+    """Syncs state from SQLite database and CLI environment, saving to state.json."""
+    doc = cmd_doctor()
+    recent_sessions: List[Dict[str, Any]] = []
+
+    if DB_PATH.is_file():
+        try:
+            conn = sqlite3.connect(f"file:{DB_PATH}?mode=ro", uri=True, timeout=2.0)
+            cursor = conn.cursor()
+
+            # Query conversation_summaries table
+            query = """
+                SELECT conversation_id, title, step_count, last_modified_time, status, workspace_uris
+                FROM conversation_summaries
+                WHERE title != '' AND killed = 0
+                ORDER BY last_modified_time DESC
+                LIMIT ?
+            """
+            cursor.execute(query, (recent_limit,))
+            rows = cursor.fetchall()
+            for row in rows:
+                conv_id, title, steps, last_mod, status, ws_uris = row
+                recent_sessions.append({
+                    "id": conv_id,
+                    "title": title or "Untitled Conversation",
+                    "step_count": steps or 0,
+                    "last_modified": format_relative_time(str(last_mod)),
+                    "status": status or "idle",
+                    "workspace": ws_uris or ""
+                })
+            conn.close()
+        except Exception as e:
+            doc["db_error"] = str(e)
+
+    state = {
+        "timestamp": datetime.now().isoformat(),
+        "doctor": doc,
+        "recent_sessions": recent_sessions
+    }
+    write_atomic_state(state)
+    return state
+
+
+def cmd_set_default():
+    """Sets Antigravity as the default coding agent in Omarchy."""
+    DEFAULT_AGENT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    DEFAULT_AGENT_FILE.write_text("agy\n")
+    notify = find_trusted_binary("notify-send")
+    if notify:
+        run_bounded_cmd([
+            notify,
+            "-a", "OmaGravity",
+            "-i", "org.omarchy.agent",
+            "Antigravity Default",
+            "Antigravity (agy) is now your default coding agent."
+        ])
+    cmd_sync()
+    print("Antigravity set as default agent.")
+
+
+def cmd_launch(args: List[str], mode: str = "terminal", terminal: str = "foot", workdir: str = "work", skip_permissions: bool = False):
+    """Launches an Antigravity session in the specified environment."""
+    agy_bin = find_trusted_binary("agy") or "agy"
+    target_dir = resolve_workdir(workdir)
+
+    cmd = [agy_bin]
+    if skip_permissions and "--dangerously-skip-permissions" not in args:
+        cmd.append("--dangerously-skip-permissions")
+    cmd.extend(args)
+
+    if mode == "herdr":
+        herdr_bin = find_trusted_binary("herdr")
+        if herdr_bin:
+            subprocess.Popen([herdr_bin, "open", "--dir", str(target_dir), "--", *cmd], cwd=target_dir)
+            return
+
+    term_bin = find_trusted_binary(terminal) or find_trusted_binary("foot") or find_trusted_binary("ghostty") or "x-terminal-emulator"
+
+    if mode == "floating":
+        if "foot" in term_bin:
+            subprocess.Popen([
+                term_bin,
+                "--app-id=org.omarchy.floating-agent",
+                "-T", "Antigravity CLI",
+                "-D", str(target_dir),
+                *cmd
+            ], cwd=target_dir)
+        elif "ghostty" in term_bin:
+            subprocess.Popen([
+                term_bin,
+                "--class=org.omarchy.floating-agent",
+                "--title=Antigravity CLI",
+                "--working-directory", str(target_dir),
+                "-e", *cmd
+            ], cwd=target_dir)
+        else:
+            subprocess.Popen([
+                term_bin,
+                "--class=org.omarchy.floating-agent",
+                "-e", *cmd
+            ], cwd=target_dir)
+    elif mode == "scratchpad":
+        # Launch in special workspace or foot scratchpad
+        if "foot" in term_bin:
+            subprocess.Popen([
+                term_bin,
+                "--app-id=org.omarchy.scratchpad.antigravity",
+                "-T", "Antigravity Scratchpad",
+                "-D", str(target_dir),
+                *cmd
+            ], cwd=target_dir)
+        else:
+            subprocess.Popen([
+                term_bin,
+                "--class=org.omarchy.scratchpad.antigravity",
+                "-e", *cmd
+            ], cwd=target_dir)
+    else:
+        # Standard interactive terminal window
+        if "foot" in term_bin:
+            subprocess.Popen([
+                term_bin,
+                "--app-id=org.omarchy.agent",
+                "-T", "Antigravity CLI",
+                "-D", str(target_dir),
+                *cmd
+            ], cwd=target_dir)
+        elif "ghostty" in term_bin:
+            subprocess.Popen([
+                term_bin,
+                "--class=org.omarchy.agent",
+                "--title=Antigravity CLI",
+                "--working-directory", str(target_dir),
+                "-e", *cmd
+            ], cwd=target_dir)
+        else:
+            subprocess.Popen([term_bin, "-e", *cmd], cwd=target_dir)
+
+
+def cmd_resume(conv_id: str, terminal: str = "foot", workdir: str = "work", skip_permissions: bool = False):
+    """Resumes a specific conversation session."""
+    cmd_launch(["--conversation", conv_id], terminal=terminal, workdir=workdir, skip_permissions=skip_permissions)
+
+
+def cmd_launch_ide(workdir: str = "work"):
+    """Launches Antigravity IDE desktop environment."""
+    ide_bin = find_trusted_binary("antigravity-ide") or find_trusted_binary("antigravity") or find_trusted_binary("code")
+    target_dir = resolve_workdir(workdir)
+    if ide_bin:
+        subprocess.Popen([ide_bin, str(target_dir)], cwd=target_dir)
+    else:
+        notify = find_trusted_binary("notify-send")
+        if notify:
+            run_bounded_cmd([notify, "-a", "OmaGravity", "Antigravity IDE", "Antigravity IDE binary not found in PATH."])
+
+
+def cmd_toggle_scratchpad():
+    """Dispatches Hyprland scratchpad toggle for Antigravity."""
+    hyprctl = find_trusted_binary("hyprctl")
+    if hyprctl:
+        run_bounded_cmd([hyprctl, "dispatch", "togglespecialworkspace", "antigravity"])
+
+
+def main():
+    parser = argparse.ArgumentParser(description="OmaGravity Helper & Session Manager")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+
+    # doctor
+    subparsers.add_parser("doctor")
+
+    # sync / status
+    sync_p = subparsers.add_parser("sync")
+    sync_p.add_argument("--limit", type=int, default=5)
+
+    status_p = subparsers.add_parser("status")
+    status_p.add_argument("--limit", type=int, default=5)
+
+    # set-default
+    subparsers.add_parser("set-default")
+
+    # launch
+    launch_p = subparsers.add_parser("launch")
+    launch_p.add_argument("--mode", choices=["terminal", "herdr", "floating", "scratchpad"], default="terminal")
+    launch_p.add_argument("--terminal", default="foot")
+    launch_p.add_argument("--workdir", default="work")
+    launch_p.add_argument("--skip-permissions", action="store_true", default=True)
+    launch_p.add_argument("args", nargs=argparse.REMAINDER)
+
+    # resume
+    resume_p = subparsers.add_parser("resume")
+    resume_p.add_argument("id", help="Conversation ID to resume")
+    resume_p.add_argument("--terminal", default="foot")
+    resume_p.add_argument("--workdir", default="work")
+
+    # new-session
+    new_p = subparsers.add_parser("new-session")
+    new_p.add_argument("dir", nargs="?", default="work")
+    new_p.add_argument("--terminal", default="foot")
+
+    # ide
+    ide_p = subparsers.add_parser("ide")
+    ide_p.add_argument("dir", nargs="?", default="work")
+
+    # toggle-scratchpad
+    subparsers.add_parser("toggle-scratchpad")
+
+    args = parser.parse_args()
+
+    if args.command == "doctor":
+        doc = cmd_doctor()
+        print(json.dumps(doc, indent=2))
+    elif args.command in ("sync", "status"):
+        res = cmd_sync(recent_limit=args.limit)
+        print(json.dumps(res, indent=2))
+    elif args.command == "set-default":
+        cmd_set_default()
+    elif args.command == "launch":
+        cmd_launch(
+            args.args or [],
+            mode=args.mode,
+            terminal=args.terminal,
+            workdir=args.workdir,
+            skip_permissions=args.skip_permissions
+        )
+    elif args.command == "resume":
+        cmd_resume(args.id, terminal=args.terminal, workdir=args.workdir)
+    elif args.command == "new-session":
+        cmd_launch([], terminal=args.terminal, workdir=args.dir)
+    elif args.command == "ide":
+        cmd_launch_ide(workdir=args.dir)
+    elif args.command == "toggle-scratchpad":
+        cmd_toggle_scratchpad()
+
+
+if __name__ == "__main__":
+    main()

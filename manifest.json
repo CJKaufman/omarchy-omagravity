@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "id": "cjkaufman.omagravity",
+  "name": "OmaGravity",
+  "version": "1.0.0",
+  "author": "Carl Kaufman",
+  "license": "MIT",
+  "description": "Antigravity CLI integration for Omarchy. Fast launcher, Herdr workspace routing, interactive session manager, and Quickshell bar panel.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "OmaGravity",
+    "description": "Antigravity CLI launcher, session switcher, and agent manager.",
+    "category": "AI",
+    "aliases": ["agy", "antigravity", "omagravity", "agent"],
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "launchMode": "terminal",
+      "preferredTerminal": "foot",
+      "defaultWorkDir": "work",
+      "skipPermissions": true,
+      "showBadge": true,
+      "recentLimit": 5,
+      "refreshIntervalSec": 15
+    },
+    "schema": [
+      {
+        "key": "launchMode",
+        "type": "enum",
+        "label": "Launch Mode",
+        "options": ["terminal", "herdr", "floating", "scratchpad"],
+        "defaultValue": "terminal",
+        "description": "Target environment when launching Antigravity sessions."
+      },
+      {
+        "key": "preferredTerminal",
+        "type": "enum",
+        "label": "Preferred Terminal",
+        "options": ["foot", "ghostty", "default"],
+        "defaultValue": "foot",
+        "description": "Terminal emulator to spawn when launchMode is terminal or floating."
+      },
+      {
+        "key": "defaultWorkDir",
+        "type": "enum",
+        "label": "Default Working Directory",
+        "options": ["work", "hivemind", "home"],
+        "defaultValue": "work",
+        "description": "Initial working directory when starting a new session."
+      },
+      {
+        "key": "skipPermissions",
+        "type": "boolean",
+        "label": "Auto-Approve Tool Permissions",
+        "defaultValue": true,
+        "description": "Pass --dangerously-skip-permissions to agy on quick launch."
+      },
+      {
+        "key": "showBadge",
+        "type": "boolean",
+        "label": "Show Active / Default Badge on Bar",
+        "defaultValue": true,
+        "description": "Display a status indicator dot when Antigravity is active or default agent."
+      },
+      {
+        "key": "recentLimit",
+        "type": "integer",
+        "label": "Recent Sessions Count",
+        "min": 3,
+        "max": 15,
+        "step": 1,
+        "defaultValue": 5,
+        "description": "Maximum number of recent conversations to display in session explorer."
+      },
+      {
+        "key": "refreshIntervalSec",
+        "type": "integer",
+        "label": "State Refresh Interval (seconds)",
+        "min": 5,
+        "max": 300,
+        "defaultValue": 15,
+        "description": "How often the background status poller syncs conversation state."
+      }
+    ]
+  }
+}
