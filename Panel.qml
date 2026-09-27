@@ -125,6 +125,8 @@ Panel {
     ]
     if (root.skipPermissions) {
       cmd.push("--skip-permissions")
+    } else {
+      cmd.push("--no-skip-permissions")
     }
     if (Array.isArray(extraArgs)) {
       cmd = cmd.concat(extraArgs)
@@ -136,12 +138,18 @@ Panel {
   function resumeSession(convId) {
     if (!convId) return
     root.lastResumedId = convId
-    runHelper([
+    var cmd = [
       "resume",
       convId,
       "--terminal", root.preferredTerminal,
       "--workdir", root.defaultWorkDir
-    ])
+    ]
+    if (root.skipPermissions) {
+      cmd.push("--skip-permissions")
+    } else {
+      cmd.push("--no-skip-permissions")
+    }
+    runHelper(cmd)
     root.close()
   }
 
