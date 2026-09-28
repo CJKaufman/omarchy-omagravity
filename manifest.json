@@ -23,7 +23,7 @@
       "launchMode": "terminal",
       "preferredTerminal": "foot",
       "defaultWorkDir": "work",
-      "skipPermissions": true,
+      "skipPermissions": false,
       "showOnBar": true,
       "recentLimit": 5,
       "refreshIntervalSec": 15
@@ -64,7 +64,7 @@
         "key": "skipPermissions",
         "type": "boolean",
         "label": "Auto-Approve Tool Permissions",
-        "defaultValue": true,
+        "defaultValue": false,
         "description": "Pass --dangerously-skip-permissions to agy on quick launch."
       },
       {

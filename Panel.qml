@@ -57,7 +57,7 @@ Panel {
   readonly property string launchMode: String(setting("launchMode", "terminal"))
   readonly property string preferredTerminal: String(setting("preferredTerminal", "foot"))
   readonly property string defaultWorkDir: String(setting("defaultWorkDir", "work"))
-  readonly property bool skipPermissions: Boolean(setting("skipPermissions", true))
+  readonly property bool skipPermissions: Boolean(setting("skipPermissions", false))
   readonly property int recentLimit: Math.max(3, Number(setting("recentLimit", 5)))
   readonly property int refreshIntervalSec: Math.max(5, Number(setting("refreshIntervalSec", 15)))
 

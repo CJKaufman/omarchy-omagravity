@@ -69,7 +69,7 @@ Configurable via Omarchy's bar settings or `manifest.json`:
 | `launchMode` | enum | `terminal` | Target environment (`terminal`, `herdr`, `floating`, `scratchpad`) |
 | `preferredTerminal` | enum | `foot` | Terminal emulator (`foot`, `ghostty`, `default`) |
 | `defaultWorkDir` | enum | `work` | Default folder (`work`, `hivemind`, `home`) |
-| `skipPermissions` | boolean | `true` | Auto-approve tool execution permissions on quick launch |
+| `skipPermissions` | boolean | `false` | Auto-approve tool execution permissions on quick launch |
 | `recentLimit` | integer | `5` | Maximum recent conversations shown in session list |
 | `refreshIntervalSec`| integer | `15` | Polling and SQLite state sync interval |
 
