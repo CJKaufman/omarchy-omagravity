@@ -16,17 +16,52 @@ Brings Google DeepMind's Antigravity CLI (`agy`) directly into the Omarchy ecosy
 
 ---
 
+## Installation
+
+### Via Omarchy Marketplace / CLI (Recommended)
+
+```bash
+omarchy plugin add https://github.com/CJKaufman/omarchy-omagravity --enable
+```
+
+### Manual Git Installation
+
+```bash
+git clone https://github.com/CJKaufman/omarchy-omagravity \
+  ~/.config/omarchy/plugins/cjkaufman.omagravity
+
+omarchy plugin enable cjkaufman.omagravity
+omarchy-restart-shell
+```
+
+---
+
+## Removal
+
+To disable and remove the plugin:
+
+```bash
+omarchy plugin disable cjkaufman.omagravity
+omarchy plugin remove cjkaufman.omagravity --yes
+omarchy-restart-shell
+```
+
+---
+
 ## Keybindings Reference
 
 Add these keybindings to `~/.config/hypr/bindings.lua`:
 
 ```lua
 -- Antigravity CLI & OmaGravity
-o.bind("SUPER + A", "Antigravity Quick Launch", "foot -a org.omarchy.agent -T 'Antigravity CLI' -D " .. (os.getenv("HOME") or "") .. "/Work agy --dangerously-skip-permissions")
+o.bind("SUPER + A", "Antigravity Quick Launch", "foot -a org.omarchy.agent -T 'Antigravity CLI' -D " .. (os.getenv("HOME") or "") .. "/Work agy")
 o.bind("SUPER + SHIFT + A", "Antigravity Continue Session", "foot -a org.omarchy.agent -T 'Antigravity CLI' -D " .. (os.getenv("HOME") or "") .. "/Work agy -c")
 o.bind("SUPER + ALT + G", "OmaGravity Bar Toggle", "omarchy-shell shell toggle cjkaufman.omagravity")
 o.bind("SUPER + ALT + A", "Antigravity Desktop IDE", "antigravity")
 ```
+
+> [!NOTE]
+> By default, `SUPER + A` launches Antigravity with standard interactive tool confirmation boundaries. If you prefer to bypass tool confirmation prompts, you can add `--dangerously-skip-permissions` to your custom binding or enable the **Auto-Approve Tool Permissions** setting in the OmaGravity bar settings panel.
 
 ---
 
